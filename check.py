@@ -43,7 +43,15 @@ def check ():
     breakout_in_subject = "breakout" in subject.lower () or "here" in subject.lower ()
     print (f"{time.time ()}: breakout or here in subject: {breakout_in_subject}")
     if not breakout_in_subject: return False, None
-    page_token_from_url = re.findall (r"(?<=\/)[a-zA-Z0-9-_]+(?=\/viewform)", message_body) [0]
+    return True, get_token_from_target (message_body)
+
+def get_token_from_target (target_):
+    target = target_
+    redirect_token_from_url = re.findall (r"(?<=https:\/\/forms.gle\/)[A-Za-z0-9]+(?=.,!?\s)?", target)
+    if len (redirect_token_from_url) > 0:
+        redirect_request = requests.get (f"https://forms.gle/{redirect_token_from_url [0]}", allow_redirects = False)
+        target = redirect_request.headers ["Location"]
+    page_token_from_url = re.findall (r"(?<=\/)[a-zA-Z0-9-_]+(?=\/viewform)", target) [0]
     return True, page_token_from_url
 
 def parse_shitty (shitty):
