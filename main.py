@@ -1,5 +1,6 @@
 import time, os
 import sys
+import concurrent.futures
 
 from check import setup_check, check
 from analysis import analyze
@@ -36,20 +37,24 @@ def main ():
         print ("Done with logins")
         return
 
-    # setup_check ()
-    # while True:
-    #     success, token = check ()
-    #     if success: break
-    #     time.sleep (0.25)
-    token = "1FAIpQLSdmuiZiYFtEoAz2nF8D8mXz2uuvbtmxNs18ETCfmRWUhK76cQ"
+    setup_check ()
+    while True:
+        success, token = check ()
+        if success: break
+        time.sleep (0.25)
+    # token = "1FAIpQLSdmuiZiYFtEoAz2nF8D8mXz2uuvbtmxNs18ETCfmRWUhK76cQ"
 
     # we have the email ladies and gentlemen!
     # I'm hardcoding the token for right now (testing).
     # token = "1FAIpQLScyEdVTNejePdBXCtqAww7s-RMkhwRx5WmJRmOfy42Mhhf4lw"
     # token = "1FAIpQLSc5Cz0RYzqk_jHeF03V0l0CNnATZZ4JVFNBp5xxoEg7F-GR7g"
     # token = "1FAIpQLSeFEruSgyAyJiXwWMUENGO0YbOKH0PkI92vBzBAxGGy1h5b7g"
-    for info in targets:
-        analysis = analyze (token, info)
+    start = time.time ()
+    with concurrent.futures.ThreadPoolExecutor () as executor:
+        for info in targets:
+            executor.submit (analyze, token, info)
+    end = time.time ()
+    print (f"submitted {len (targets)} responses in {end - start} seconds")
 
 
 if __name__ == "__main__":

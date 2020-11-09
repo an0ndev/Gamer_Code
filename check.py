@@ -52,7 +52,7 @@ def get_token_from_target (target_):
         redirect_request = requests.get (f"https://forms.gle/{redirect_token_from_url [0]}", allow_redirects = False)
         target = redirect_request.headers ["Location"]
     page_token_from_url = re.findall (r"(?<=\/)[a-zA-Z0-9-_]+(?=\/viewform)", target) [0]
-    return True, page_token_from_url
+    return page_token_from_url
 
 def parse_shitty (shitty):
     shitty_lines = shitty.split ("\n")
