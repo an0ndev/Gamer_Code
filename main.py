@@ -2,7 +2,7 @@ import time, os
 import sys
 import concurrent.futures
 
-from check import setup_check, check
+from check import Checker
 from analysis import analyze
 from dump_cookies import dump_cookies
 
@@ -29,9 +29,9 @@ def main ():
         print ("Done with logins")
         return
 
-    setup_check ()
+    checker = Checker ()
     while True:
-        success, token = check ()
+        success, token = checker.check ()
         if success: break
         time.sleep (0.25)
 
