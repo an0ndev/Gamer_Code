@@ -2,7 +2,7 @@ import time, os
 import sys
 import concurrent.futures
 
-from check import setup_check, check
+from check import Checker
 from analysis import analyze
 from dump_cookies import dump_cookies
 
@@ -21,14 +21,6 @@ targets = [
     ["stehlik.blake2022@istemghs.org", "Blake Stehlik", "4", ["Petrecca", "Zobel", "Falin"], "Coding breakout"]
 ]
 
-def process_link (link):
-    for target in targets:
-        execute_form (link, target)
-
-def execute_form (link, target):
-    # Automate calling the form based on the link and the target details
-    pass
-
 def main ():
     for info in targets:
         cookie_file_path = f"cookies/{info [0]}.p"
@@ -37,18 +29,12 @@ def main ():
         print ("Done with logins")
         return
 
-    setup_check ()
+    checker = Checker ()
     while True:
-        success, token = check ()
+        success, token = checker.check ()
         if success: break
         time.sleep (0.25)
-    # token = "1FAIpQLSdmuiZiYFtEoAz2nF8D8mXz2uuvbtmxNs18ETCfmRWUhK76cQ"
 
-    # we have the email ladies and gentlemen!
-    # I'm hardcoding the token for right now (testing).
-    # token = "1FAIpQLScyEdVTNejePdBXCtqAww7s-RMkhwRx5WmJRmOfy42Mhhf4lw"
-    # token = "1FAIpQLSc5Cz0RYzqk_jHeF03V0l0CNnATZZ4JVFNBp5xxoEg7F-GR7g"
-    # token = "1FAIpQLSeFEruSgyAyJiXwWMUENGO0YbOKH0PkI92vBzBAxGGy1h5b7g"
     start = time.time ()
     with concurrent.futures.ThreadPoolExecutor () as executor:
         for info in targets:

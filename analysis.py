@@ -1,8 +1,6 @@
 import requests
 import bs4
 import json
-from selenium import webdriver
-import time
 import pickle
 import os.path
 import dump_cookies
@@ -37,16 +35,19 @@ def analyze (token, info):
     free_bird_public_load_data = json.loads (last_script_tag)
     # (These indices are extracted from a dump of a test form's HTML)
     detailed_info = free_bird_public_load_data [1]
+    # noinspection PyUnusedLocal
     description = detailed_info [0]
     questions = detailed_info [1]
+    # noinspection PyUnusedLocal
     name = detailed_info [8]
     # print (f"Description: {description}, name: {name}")
     out_questions = []
     section_count = 1
     for in_question in questions:
-        question = {}
-        question ["id"] = in_question [0]
-        question ["name"] = in_question [1]
+        question = {
+            "id": in_question [0],
+            "name": in_question [1]
+        }
         if in_question [3] in question_types:
             question ["type"] = question_types [in_question [3]]
         else:
@@ -66,10 +67,12 @@ def analyze (token, info):
     # info is in the format ["reed.eric2022@istemghs.org", "Eric Reed", "Petrecca", "More gaming would be cool"]
 
     draft = []
-    def add_normal (answer_id, answer_value):
-        response_body [f"entry.{answer_id}"] = answer_value
-    def add_draft (answer_id, answer_value):
-        draft.append ([None, answer_id, [answer_value], 0])
+
+    # noinspection PyUnusedLocal
+    def add_normal (_answer_id, answer_value):
+        response_body [f"entry.{_answer_id}"] = answer_value
+    def add_draft (_answer_id, answer_value):
+        draft.append ([None, _answer_id, [answer_value], 0])
     add = add_draft
 
     for question in out_questions:
@@ -78,8 +81,8 @@ def analyze (token, info):
         type_is = lambda check_type: question ["type"] == check_type
         def is_yes_no (lenient = False):
             if not type_is ("multiple_choice"): return False
-            answer_list = question ["answer_info"] [0] [1]
-            return answer_list [0] [0] == "Yes" and (answer_list [1] [0] == "No" or lenient)
+            _answer_list = question ["answer_info"] [0] [1]
+            return _answer_list [0] [0] == "Yes" and (_answer_list [1] [0] == "No" or lenient)
         print (f"Question ID: {question ['id']}")
         print (f"Answer ID: {answer_id}")
         print (f"Lowercase name: {lower_name}")
@@ -169,19 +172,19 @@ def analyze (token, info):
     print (f"Extracted token: {token_data ['info_params'] ['token']}")
 
     input_tags = list (html.find_all ("input"))
-    fbzx = None
+    freebird_submission_token = None
     for input_tag in input_tags:
         if input_tag ["type"] != "hidden": continue
         if input_tag ["name"] != "fbzx": continue
-        fbzx = input_tag ["value"]
-    if fbzx is None: raise Exception ("Couldn't find fbzx")
-    print (f"Extracted fbzx: {fbzx}")
+        freebird_submission_token = input_tag ["value"]
+    if freebird_submission_token is None: raise Exception ("Couldn't find fbzx")
+    print (f"Extracted fbzx: {freebird_submission_token}")
 
     response_body ["emailReceipt"] = ""
     response_body ["fvv"] = "1"
     response_body ["token"] = token_data ["info_params"] ["token"]
-    response_body ["fbzx"] = fbzx
-    response_body ["draftResponse"] = json.dumps ([draft, None, fbzx, None, None, None, info [0], 0])
+    response_body ["fbzx"] = freebird_submission_token
+    response_body ["draftResponse"] = json.dumps ([draft, None, freebird_submission_token, None, None, None, info [0], 0])
     response_body ["pageHistory"] = ','.join (str (page_number) for page_number in range (section_count))
     pprint (response_body)
 
