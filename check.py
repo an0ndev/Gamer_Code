@@ -2,9 +2,7 @@ from google_auth_oauthlib.flow import InstalledAppFlow
 from googleapiclient.discovery import build
 import requests
 import random
-import json
 import base64
-import quopri
 import re
 import time
 
@@ -51,7 +49,7 @@ def get_token_from_target (target_):
     if len (redirect_token_from_url) > 0:
         redirect_request = requests.get (f"https://forms.gle/{redirect_token_from_url [0]}", allow_redirects = False)
         target = redirect_request.headers ["Location"]
-    page_token_from_url = re.findall (r"(?<=\/)[a-zA-Z0-9-_]+(?=\/viewform)", target) [0]
+    page_token_from_url = re.findall (r"(?<=/)[a-zA-Z0-9-_]+(?=/viewform)", target) [0]
     return page_token_from_url
 
 def parse_shitty (shitty):
